@@ -1,153 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Visitor Dashboard</title>
+<title>Visitor Panel</title>
 
 <style>
-body{
-  background:#0b1220;
-  color:#fff;
-  font-family:Poppins, sans-serif;
-  padding:20px;
+body{background:#0b1220;color:white;font-family:Poppins;padding:20px}
+h1{text-align:center}
+
+#loginBox{
+  position:fixed;inset:0;
+  background:#000;display:flex;
+  justify-content:center;align-items:center;
 }
 
-h1{
-  text-align:center;
-  margin-bottom:20px;
+.box{
+  background:#111;padding:30px;border-radius:10px;
 }
 
-.login{
-  text-align:center;
-  margin-bottom:20px;
-}
-
-input,button{
-  padding:10px;
-  border:none;
-  border-radius:6px;
-}
-
-button{
-  background:cyan;
-  cursor:pointer;
-}
-
-.stats{
-  display:flex;
-  gap:15px;
-  justify-content:center;
-  margin-bottom:20px;
-}
+button{padding:8px 15px;background:cyan;border:none;border-radius:6px}
+input{padding:8px;border-radius:6px;border:none}
 
 .card{
-  background:#111827;
-  padding:15px;
-  border-radius:10px;
-  text-align:center;
-  min-width:120px;
+  background:#111;margin:10px 0;padding:15px;border-radius:10px;
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
+.top{
+  display:flex;justify-content:space-between;
 }
 
-th,td{
-  padding:10px;
-  text-align:center;
-  font-size:12px;
-}
-
-th{
-  background:#111827;
-}
-
-tr:nth-child(even){
-  background:#1f2937;
-}
-
-tr:hover{
-  background:#374151;
+.more{
+  display:none;font-size:12px;margin-top:10px;color:#ccc;
 }
 </style>
-
 </head>
 
 <body>
 
-<h1>Visitor Dashboard 🚀</h1>
-
-<div class="login">
-<input id="pass" placeholder="Enter password">
-<button onclick="login()">Login</button>
+<div id="loginBox">
+  <div class="box">
+    <h3>Enter Password </h3>
+    <input id="pass">
+    <button onclick="login()">Enter</button>
+  </div>
 </div>
 
-<div class="stats" id="stats" style="display:none;">
-  <div class="card">👥 Total: <span id="total">0</span></div>
-  <div class="card">🌍 Countries: <span id="countries">0</span></div>
-  <div class="card">📱 Devices: <span id="devices">0</span></div>
-</div>
+<h1>Visitor Dashboard !🚀</h1>
 
-<table id="table"></table>
+<button onclick="loadData()">🔄 Refresh</button>
+
+<div id="data"></div>
 
 <script>
+
+let DATA = [];
 
 function login(){
   const pass = document.getElementById("pass").value;
 
   fetch("https://sksvisit.vercel.app/api/data", {
-    headers:{
-      Authorization: "Bearer " + pass
-    }
+    headers:{ Authorization: "Bearer " + pass }
   })
   .then(res => res.json())
-  .then(data => {
-
-    // 🔥 stats
-    document.getElementById("stats").style.display = "flex";
-    document.getElementById("total").innerText = data.length;
-
-    let countries = new Set();
-    let devices = new Set();
-
-    data.forEach(v=>{
-      countries.add(v.country);
-      devices.add(v.device);
-    });
-
-    document.getElementById("countries").innerText = countries.size;
-    document.getElementById("devices").innerText = devices.size;
-
-    // 🔥 table
-    let html = `
-    <tr>
-  <th>IP</th>
-  <th>ISP</th>
-  <th>City</th>
-  <th>Region</th>
-  <th>Device</th>
-  <th>Battery</th>
-  <th>Charging</th>
-  <th>Referrer</th>
-  <th>Time</th>
-</tr>`;
-
-    data.forEach(v=>{
-  html += `
-  <tr>
-    <td>${v.ip}</td>
-    <td>${v.isp}</td>
-    <td>${v.city}</td>
-    <td>${v.region}</td>
-    <td>${v.device}</td>
-    <td>${v.battery}</td>
-    <td>${v.charging ? "⚡ Yes" : "No"}</td>
-    <td>${v.referrer}</td>
-    <td>${v.time}</td>
-  </tr>`;
-});
-    document.getElementById("table").innerHTML = html;
+  .then(d=>{
+    DATA = d;
+    document.getElementById("loginBox").style.display="none";
+    render(DATA);
   });
+}
+
+function loadData(){
+  fetch("https://sksvisit.vercel.app/api/data", {
+    headers:{ Authorization: "Bearer SY4M" }
+  })
+  .then(res=>res.json())
+  .then(d=>{
+    DATA = d;
+    render(DATA);
+  });
+}
+
+function render(data){
+  let html="";
+
+  data.forEach((v,i)=>{
+
+    html+=`
+    <div class="card">
+
+      <div class="top">
+        <div>
+          <b>${v.time}</b><br>
+          ${v.city}
+        </div>
+
+        <button onclick="toggle(${i})">More</button>
+      </div>
+
+      <div class="more" id="m${i}">
+        IP: ${v.ip}<br>
+        ISP: ${v.isp}<br>
+        Region: ${v.region}<br>
+        Device: ${v.device}<br>
+        Browser: ${v.browser}<br>
+        Battery: ${v.battery}<br>
+        Charging: ${v.charging}<br>
+        Referrer: ${v.referrer}
+      </div>
+
+    </div>
+    `;
+  });
+
+  document.getElementById("data").innerHTML = html;
+}
+
+function toggle(i){
+  const el = document.getElementById("m"+i);
+  el.style.display = el.style.display==="block" ? "none" : "block";
 }
 
 </script>
