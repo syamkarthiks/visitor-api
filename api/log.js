@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   };
 
   // 🔥 SEND TO SUPABASE
-  await fetch("https://cczcijtifrhihnpczfjt.supabase.co", {
+  await fetch("https://cczcjjtifrihhnpczfjt.supabase.co/rest/v1/visitors", {
     method: "POST",
     headers: {
       "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
