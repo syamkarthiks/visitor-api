@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   }
 
   const data = await fetch(
-    "https://cczcjjtifrihhnpczfjt.supabase.co/rest/v1/visitors?select=*&order=time.desc",
+    "https://cczcijtifrhihnpczfjt.supabase.co/rest/v1/visitors?select=*&order=time.desc",
     {
       headers: {
         "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
