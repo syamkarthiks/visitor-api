@@ -60,7 +60,7 @@ tr:hover{
 function login(){
   const pass = document.getElementById("pass").value;
 
-  fetch('/api/data', {
+  fetch('https://sksvisit.vercel.app/api/data', {
     headers:{
       Authorization: "Bearer " + pass
     }
