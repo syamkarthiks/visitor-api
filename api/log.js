@@ -16,8 +16,8 @@ export default async function handler(req, res) {
 
     let info = {};
     try {
-      const response = await fetch(`https://ipapi.co/${ip}/json`);
-      info = await response.json();
+      const response = await fetch(`http://ip-api.com/json/${ip}`);
+info = await response.json();
     } catch {}
 
     // 🔥 3. Combine everything (EDIT HERE)
