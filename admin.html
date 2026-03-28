@@ -1,47 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Visitor Admin Dashboard</title>
+<title>Visitor Dashboard</title>
+
 <style>
-body{background:#0b1220;color:white;font-family:Arial;padding:20px}
-h1{margin-bottom:20px}
-input,button{padding:10px;border:none;border-radius:6px}
-button{background:cyan;cursor:pointer}
-table{width:100%;border-collapse:collapse;margin-top:20px}
-th,td{padding:10px;text-align:center}
-th{background:#111827}
-tr:nth-child(even){background:#1f2937}
-tr:hover{background:#374151}
+body{
+  background:#0b1220;
+  color:#fff;
+  font-family:Poppins, sans-serif;
+  padding:20px;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.login{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+input,button{
+  padding:10px;
+  border:none;
+  border-radius:6px;
+}
+
+button{
+  background:cyan;
+  cursor:pointer;
+}
+
+.stats{
+  display:flex;
+  gap:15px;
+  justify-content:center;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#111827;
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
+  min-width:120px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:10px;
+  text-align:center;
+  font-size:12px;
+}
+
+th{
+  background:#111827;
+}
+
+tr:nth-child(even){
+  background:#1f2937;
+}
+
+tr:hover{
+  background:#374151;
+}
 </style>
+
 </head>
 
 <body>
 
-<h1>Visitor Admin Dashboard</h1>
+<h1>Visitor Dashboard 🚀</h1>
 
+<div class="login">
 <input id="pass" placeholder="Enter password">
 <button onclick="login()">Login</button>
+</div>
+
+<div class="stats" id="stats" style="display:none;">
+  <div class="card">👥 Total: <span id="total">0</span></div>
+  <div class="card">🌍 Countries: <span id="countries">0</span></div>
+  <div class="card">📱 Devices: <span id="devices">0</span></div>
+</div>
 
 <table id="table"></table>
 
 <script>
+
 function login(){
   const pass = document.getElementById("pass").value;
 
-  fetch('https://sksvisit.vercel.app/api/data', {
+  fetch("https://sksvisit.vercel.app/api/data", {
     headers:{
       Authorization: "Bearer " + pass
     }
   })
   .then(res => res.json())
   .then(data => {
+
+    // 🔥 stats
+    document.getElementById("stats").style.display = "flex";
+    document.getElementById("total").innerText = data.length;
+
+    let countries = new Set();
+    let devices = new Set();
+
+    data.forEach(v=>{
+      countries.add(v.country);
+      devices.add(v.device);
+    });
+
+    document.getElementById("countries").innerText = countries.size;
+    document.getElementById("devices").innerText = devices.size;
+
+    // 🔥 table
     let html = `
     <tr>
       <th>IP</th>
       <th>Country</th>
+      <th>Region</th>
       <th>City</th>
       <th>ISP</th>
       <th>Device</th>
+      <th>Battery</th>
+      <th>Charging</th>
       <th>Referrer</th>
       <th>Time</th>
     </tr>`;
@@ -51,19 +138,21 @@ function login(){
       <tr>
         <td>${v.ip}</td>
         <td>${v.country}</td>
+        <td>${v.region}</td>
         <td>${v.city}</td>
         <td>${v.isp}</td>
-        <td>${v.ua}</td>
+        <td>${v.device}</td>
+        <td>${v.battery}</td>
+        <td>${v.charging ? "⚡ Yes" : "No"}</td>
         <td>${v.referrer}</td>
-        <td>${new Date(v.time).toLocaleString('en-IN', {
-  timeZone: 'Asia/Kolkata'
-})}</td>
+        <td>${v.time}</td>
       </tr>`;
     });
 
     document.getElementById("table").innerHTML = html;
   });
 }
+
 </script>
 
 </body>
