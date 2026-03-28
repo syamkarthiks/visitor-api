@@ -2,58 +2,62 @@ export default async function handler(req, res) {
   try {
     res.setHeader("Access-Control-Allow-Origin", "*");
 
-    // 🔥 1. Better IP detection (ADD HERE)
     let ip =
       req.headers['x-forwarded-for']?.split(',')[0] ||
       req.headers['x-real-ip'] ||
       req.headers['cf-connecting-ip'] ||
-      "8.8.8.8";
+      "unknown";
 
-    const ua = req.headers['user-agent'] || "unknown";
-
-    // 🔥 2. Read frontend data (ADD HERE)
     const body = req.method === "POST" ? req.body : {};
+    const ua = body.ua || req.headers['user-agent'] || "unknown";
 
+    // 🔥 LOCATION API (BEST)
     let info = {};
     try {
-      const response = await fetch(`http://ip-api.com/json/${ip}`);
-info = await response.json();
+      const r = await fetch(`https://ipapi.co/${ip}/json/`);
+      info = await r.json();
     } catch {}
 
-    // 🔥 3. Combine everything (EDIT HERE)
+    // 🔥 REFERRER DETECTION
+    let source = "Direct";
+    if (ua.includes("Instagram")) source = "Instagram";
+    else if (ua.includes("WhatsApp")) source = "WhatsApp";
+    else if (ua.includes("FB")) source = "Facebook";
+    else if (body.referrer) source = body.referrer;
+
     const payload = {
       ip,
       country: info.country_name || "Unknown",
+      region: info.region || "Unknown",
       city: info.city || "Unknown",
       isp: info.org || "Unknown",
+
+      device: body.device || "unknown",
       ua,
 
-      // ✅ NEW DATA
-      referrer: body.referrer || req.headers.referer || "Direct",
-      page: body.page || "unknown",
-      screen: body.screen || "unknown",
-      dark: body.dark || false,
-      network: body.network || "unknown",
+      battery: body.battery || "unknown",
+      charging: body.charging || false,
 
-      time: new Date().toISOString()
+      referrer: source,
+
+      time: new Date().toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata"
+      })
     };
 
-    // 🔥 4. Send to Supabase
     await fetch("https://cczcijtifrhihnpczfjt.supabase.co/rest/v1/visitors", {
-  method: "POST",
-  headers: {
-    "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
-    "Authorization": "Bearer sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
-    "Content-Type": "application/json",
-    "Prefer": "return=representation"
-  },
-  body: JSON.stringify(payload)
-});
+      method: "POST",
+      headers: {
+        "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
+        "Authorization": "Bearer sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
 
     res.json({ success: true });
 
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "server error" });
   }
 }
