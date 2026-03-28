@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     "https://cczcjjtifrihhnpczfjt.supabase.co/rest/v1/visitors?select=*&order=time.desc",
     {
       headers: {
-        "apikey": "YOUR_ANON_KEY",
+        "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc"
         "Content-Type": "application/json"
       }
     }
