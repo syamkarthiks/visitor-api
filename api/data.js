@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   const key = req.headers.authorization;
 
-  if (key !== "Bearer SYAM_SECRET") {
+  if (key !== "Bearer SY4M") {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
