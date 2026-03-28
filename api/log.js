@@ -1,0 +1,42 @@
+export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  // Get IP
+  const ip =
+    req.headers['x-forwarded-for'] ||
+    req.socket.remoteAddress ||
+    "unknown";
+
+  const ua = req.headers['user-agent'] || "unknown";
+
+  // Get location + ISP
+  let info = {};
+  try {
+    info = await fetch(`https://ipapi.co/${ip}/json`)
+      .then(r => r.json());
+  } catch {
+    info = {};
+  }
+
+  const payload = {
+    ip,
+    country: info.country_name || "Unknown",
+    city: info.city || "Unknown",
+    isp: info.org || "Unknown",
+    ua,
+    referrer: req.headers.referer || "Direct",
+    time: new Date().toISOString()
+  };
+
+  // 🔥 SEND TO SUPABASE
+  await fetch("https://cczcijtifrhihnpczfjt.supabase.co", {
+    method: "POST",
+    headers: {
+      "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  res.status(200).json({ success: true });
+}
