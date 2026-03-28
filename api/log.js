@@ -2,43 +2,54 @@ export default async function handler(req, res) {
   try {
     res.setHeader("Access-Control-Allow-Origin", "*");
 
-    // safer IP detection
-    let ip = req.headers['x-forwarded-for'];
-    if (ip) ip = ip.split(',')[0];
-    if (!ip) ip = req.socket?.remoteAddress || "8.8.8.8";
+    // 🔥 1. Better IP detection (ADD HERE)
+    let ip =
+      req.headers['x-forwarded-for']?.split(',')[0] ||
+      req.headers['x-real-ip'] ||
+      req.headers['cf-connecting-ip'] ||
+      "8.8.8.8";
 
     const ua = req.headers['user-agent'] || "unknown";
+
+    // 🔥 2. Read frontend data (ADD HERE)
+    const body = req.method === "POST" ? req.body : {};
 
     let info = {};
     try {
       const response = await fetch(`https://ipapi.co/${ip}/json`);
       info = await response.json();
-    } catch (e) {
-      info = {};
-    }
+    } catch {}
 
+    // 🔥 3. Combine everything (EDIT HERE)
     const payload = {
       ip,
       country: info.country_name || "Unknown",
       city: info.city || "Unknown",
       isp: info.org || "Unknown",
       ua,
-      referrer: req.headers.referer || "Direct",
+
+      // ✅ NEW DATA
+      referrer: body.referrer || req.headers.referer || "Direct",
+      page: body.page || "unknown",
+      screen: body.screen || "unknown",
+      dark: body.dark || false,
+      network: body.network || "unknown",
+
       time: new Date().toISOString()
     };
 
-    // send to supabase
+    // 🔥 4. Send to Supabase
     await fetch("https://cczcijtifrhihnpczfjt.supabase.co/rest/v1/visitors", {
       method: "POST",
       headers: {
         "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
+        "Authorization": "Bearer YOUR_ANON_KEY",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
 
-    res.status(200).json({ success: true });
+    res.json({ success: true });
 
   } catch (err) {
     console.error(err);
