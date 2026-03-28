@@ -121,34 +121,31 @@ function login(){
     // 🔥 table
     let html = `
     <tr>
-      <th>IP</th>
-      <th>Country</th>
-      <th>Region</th>
-      <th>City</th>
-      <th>ISP</th>
-      <th>Device</th>
-      <th>Battery</th>
-      <th>Charging</th>
-      <th>Referrer</th>
-      <th>Time</th>
-    </tr>`;
+  <th>IP</th>
+  <th>ISP</th>
+  <th>City</th>
+  <th>Region</th>
+  <th>Device</th>
+  <th>Battery</th>
+  <th>Charging</th>
+  <th>Referrer</th>
+  <th>Time</th>
+</tr>`;
 
     data.forEach(v=>{
-      html += `
-      <tr>
-        <td>${v.ip}</td>
-        <td>${v.country}</td>
-        <td>${v.region}</td>
-        <td>${v.city}</td>
-        <td>${v.isp}</td>
-        <td>${v.device}</td>
-        <td>${v.battery}</td>
-        <td>${v.charging ? "⚡ Yes" : "No"}</td>
-        <td>${v.referrer}</td>
-        <td>${v.time}</td>
-      </tr>`;
-    });
-
+  html += `
+  <tr>
+    <td>${v.ip}</td>
+    <td>${v.isp}</td>
+    <td>${v.city}</td>
+    <td>${v.region}</td>
+    <td>${v.device}</td>
+    <td>${v.battery}</td>
+    <td>${v.charging ? "⚡ Yes" : "No"}</td>
+    <td>${v.referrer}</td>
+    <td>${v.time}</td>
+  </tr>`;
+});
     document.getElementById("table").innerHTML = html;
   });
 }
