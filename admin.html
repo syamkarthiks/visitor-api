@@ -55,7 +55,9 @@ function login(){
         <td>${v.isp}</td>
         <td>${v.ua}</td>
         <td>${v.referrer}</td>
-        <td>${new Date(v.time).toLocaleString()}</td>
+        <td>${new Date(v.time).toLocaleString('en-IN', {
+  timeZone: 'Asia/Kolkata'
+})}</td>
       </tr>`;
     });
 
