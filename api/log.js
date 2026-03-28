@@ -10,19 +10,26 @@ export default async function handler(req, res) {
     const body = req.method === "POST" ? req.body : {};
     const ua = body.ua || req.headers['user-agent'] || "unknown";
 
-    // 🔥 GET LOCATION
+    // 🌐 location
     let info = {};
     try {
       const r = await fetch(`https://ipapi.co/${ip}/json/`);
       info = await r.json();
     } catch {}
 
-    // 🔥 DEVICE NAME
+    // 📱 device
     let device = "Desktop";
     if (/android/i.test(ua)) device = "Android";
-    if (/iPhone|iPad/i.test(ua)) device = "iPhone";
+    if (/iPhone/i.test(ua)) device = "iPhone";
+    if (/iPad/i.test(ua)) device = "iPad";
 
-    // 🔥 REFERRER
+    // 🌍 browser
+    let browser = "Unknown";
+    if (ua.includes("Chrome")) browser = "Chrome";
+    if (ua.includes("Firefox")) browser = "Firefox";
+    if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+
+    // 🔗 referrer
     let source = "Direct";
     if (ua.includes("Instagram")) source = "Instagram";
     else if (ua.includes("WhatsApp")) source = "WhatsApp";
@@ -36,6 +43,7 @@ export default async function handler(req, res) {
       region: info.region || "Unknown",
 
       device,
+      browser,
       ua,
 
       battery: body.battery || "unknown",
