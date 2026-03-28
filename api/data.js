@@ -6,10 +6,11 @@ export default async function handler(req, res) {
   }
 
   const data = await fetch(
-    "https://cczcijtifrhihnpczfjt.supabase.co",
+    "https://cczcjjtifrihhnpczfjt.supabase.co/rest/v1/visitors?select=*&order=time.desc",
     {
       headers: {
-        "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc"
+        "apikey": "YOUR_ANON_KEY",
+        "Content-Type": "application/json"
       }
     }
   ).then(r => r.json());
