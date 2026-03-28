@@ -5,20 +5,24 @@ export default async function handler(req, res) {
     let ip =
       req.headers['x-forwarded-for']?.split(',')[0] ||
       req.headers['x-real-ip'] ||
-      req.headers['cf-connecting-ip'] ||
       "unknown";
 
     const body = req.method === "POST" ? req.body : {};
     const ua = body.ua || req.headers['user-agent'] || "unknown";
 
-    // 🔥 LOCATION API (BEST)
+    // 🔥 GET LOCATION
     let info = {};
     try {
       const r = await fetch(`https://ipapi.co/${ip}/json/`);
       info = await r.json();
     } catch {}
 
-    // 🔥 REFERRER DETECTION
+    // 🔥 DEVICE NAME
+    let device = "Desktop";
+    if (/android/i.test(ua)) device = "Android";
+    if (/iPhone|iPad/i.test(ua)) device = "iPhone";
+
+    // 🔥 REFERRER
     let source = "Direct";
     if (ua.includes("Instagram")) source = "Instagram";
     else if (ua.includes("WhatsApp")) source = "WhatsApp";
@@ -27,12 +31,11 @@ export default async function handler(req, res) {
 
     const payload = {
       ip,
-      country: info.country_name || "Unknown",
-      region: info.region || "Unknown",
-      city: info.city || "Unknown",
       isp: info.org || "Unknown",
+      city: info.city || "Unknown",
+      region: info.region || "Unknown",
 
-      device: body.device || "unknown",
+      device,
       ua,
 
       battery: body.battery || "unknown",
