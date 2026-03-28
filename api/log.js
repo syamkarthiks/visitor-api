@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     };
 
     // send to supabase
-    await fetch("https://cczcjjtifrihhnpczfjt.supabase.co/rest/v1/visitors", {
+    await fetch("https://cczcijtifrhihnpczfjt.supabase.co/rest/v1/visitors", {
       method: "POST",
       headers: {
         "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
