@@ -40,14 +40,15 @@ info = await response.json();
 
     // 🔥 4. Send to Supabase
     await fetch("https://cczcijtifrhihnpczfjt.supabase.co/rest/v1/visitors", {
-      method: "POST",
-      headers: {
-        "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
-        "Authorization": "Bearer YOUR_ANON_KEY",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+  method: "POST",
+  headers: {
+    "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
+    "Authorization": "Bearer sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
+    "Content-Type": "application/json",
+    "Prefer": "return=representation"
+  },
+  body: JSON.stringify(payload)
+});
 
     res.json({ success: true });
 
