@@ -1,7 +1,6 @@
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
-  // Get IP
   const ip =
     req.headers['x-forwarded-for'] ||
     req.socket.remoteAddress ||
@@ -9,14 +8,11 @@ export default async function handler(req, res) {
 
   const ua = req.headers['user-agent'] || "unknown";
 
-  // Get location + ISP
   let info = {};
   try {
     info = await fetch(`https://ipapi.co/${ip}/json`)
       .then(r => r.json());
-  } catch {
-    info = {};
-  }
+  } catch {}
 
   const payload = {
     ip,
@@ -28,15 +24,15 @@ export default async function handler(req, res) {
     time: new Date().toISOString()
   };
 
-  // 🔥 SEND TO SUPABASE
   await fetch("https://cczcjjtifrihhnpczfjt.supabase.co/rest/v1/visitors", {
     method: "POST",
     headers: {
       "apikey": "sb_publishable_VvFlbW7pKR-6iH5gdarBcA_ZOgdpMuc",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal"
     },
     body: JSON.stringify(payload)
   });
 
-  res.status(200).json({ success: true });
+  res.json({ success: true });
 }
