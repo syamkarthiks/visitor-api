@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Visitor Admin Dashboard</title>
+<style>
+body{
+  background:#0b1220;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+h1{margin-bottom:20px}
+
+input,button{
+  padding:10px;
+  border:none;
+  border-radius:6px;
+}
+
+button{
+  background:cyan;
+  cursor:pointer;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+
+th,td{
+  padding:10px;
+  text-align:center;
+}
+
+th{
+  background:#111827;
+}
+
+tr:nth-child(even){
+  background:#1f2937;
+}
+
+tr:hover{
+  background:#374151;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Visitor Admin Dashboard</h1>
+
+<input id="pass" placeholder="Enter password">
+<button onclick="login()">Login</button>
+
+<table id="table"></table>
+
+<script>
+function login(){
+  const pass = document.getElementById("pass").value;
+
+  fetch('/api/data', {
+    headers:{
+      Authorization: "Bearer " + pass
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    let html = `
+    <tr>
+      <th>IP</th>
+      <th>Country</th>
+      <th>City</th>
+      <th>ISP</th>
+      <th>Device</th>
+      <th>Referrer</th>
+      <th>Time</th>
+    </tr>`;
+
+    data.forEach(v=>{
+      html += `
+      <tr>
+        <td>${v.ip}</td>
+        <td>${v.country}</td>
+        <td>${v.city}</td>
+        <td>${v.isp}</td>
+        <td>${v.ua}</td>
+        <td>${v.referrer}</td>
+        <td>${new Date(v.time).toLocaleString()}</td>
+      </tr>`;
+    });
+
+    document.getElementById("table").innerHTML = html;
+  });
+}
+</script>
+
+</body>
+</html>
