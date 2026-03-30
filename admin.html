@@ -1,106 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Visitors Panel</title>
+<title>Visitor Panel</title>
 
 <style>
-body{
-  background:#0b1220;
-  color:white;
-  font-family:Poppins;
-  padding:20px;
-}
+body{background:#0b1220;color:white;font-family:Poppins;padding:20px}
+h1{text-align:center}
 
-h1{
-  text-align:center;
-  margin-bottom:20px;
-}
+#loginBox{position:fixed;inset:0;background:#000;display:flex;justify-content:center;align-items:center}
+.box{background:#111;padding:30px;border-radius:10px;text-align:center}
 
-/* login */
-#loginBox{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
+input{padding:10px;border-radius:6px;border:none}
+button{padding:8px 15px;background:cyan;border:none;border-radius:6px;cursor:pointer;margin-top:10px}
 
-.box{
-  background:#111;
-  padding:30px;
-  border-radius:10px;
-  text-align:center;
-}
+.stats{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.stat{background:#111;padding:10px 15px;border-radius:10px;box-shadow:0 0 10px cyan}
 
-input{
-  padding:10px;
-  border-radius:6px;
-  border:none;
-  margin-top:10px;
-}
-
-button{
-  padding:8px 15px;
-  background:cyan;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-/* stats */
-.stats{
-  display:flex;
-  gap:10px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
-}
-
-.stat{
-  background:#111;
-  padding:10px 15px;
-  border-radius:10px;
-  box-shadow:0 0 10px cyan;
-}
-
-/* cards */
-.card{
-  background:#111;
-  margin:10px 0;
-  padding:15px;
-  border-radius:10px;
-  box-shadow:0 0 10px rgba(0,255,255,0.2);
-}
-
-.top{
-  display:flex;
-  justify-content:space-between;
-}
-
-.more{
-  display:none;
-  font-size:13px;
-  margin-top:10px;
-  color:#ccc;
-}
+.card{background:#111;margin:10px 0;padding:15px;border-radius:10px;box-shadow:0 0 10px rgba(0,255,255,0.2)}
+.top{display:flex;justify-content:space-between}
+.more{display:none;font-size:13px;margin-top:10px;color:#ccc}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div id="loginBox">
   <div class="box">
-    <h3>Enter Password</h3>
-    <input id="pass" placeholder="Password">
+    <h3>Password</h3>
+    <input id="pass">
     <br>
     <button onclick="login()">Enter</button>
   </div>
 </div>
 
-<h1>Visitors Dashboard .🚀</h1>
+<h1>Visitor Dashboard 🚀</h1>
 
 <button onclick="loadData()">🔄 Refresh</button>
 
@@ -111,14 +44,16 @@ button{
 
 let DATA = [];
 
-// LOGIN
 function login(){
   const pass = document.getElementById("pass").value;
 
   fetch("https://sksvisit.vercel.app/api/data", {
     headers:{ Authorization: "Bearer " + pass }
   })
-  .then(res => res.json())
+  .then(res=>{
+    if(!res.ok) throw "err";
+    return res.json();
+  })
   .then(d=>{
     DATA = d;
     document.getElementById("loginBox").style.display="none";
@@ -127,7 +62,6 @@ function login(){
   .catch(()=>alert("Wrong password"));
 }
 
-// REFRESH
 function loadData(){
   fetch("https://sksvisit.vercel.app/api/data", {
     headers:{ Authorization: "Bearer SY4M" }
@@ -139,7 +73,6 @@ function loadData(){
   });
 }
 
-// STATS
 function renderStats(data){
   const total = data.length;
   const mobile = data.filter(v=>v.device !== "Desktop").length;
@@ -152,27 +85,19 @@ function renderStats(data){
   `;
 }
 
-// SAFE VALUE
-function safe(val){
-  if(!val || val === "Unknown") return "—";
-  return val;
+function safe(v){
+  return (!v || v==="Unknown") ? "—" : v;
 }
 
-// FIX TIME
 function formatTime(t){
   if(!t) return "—";
-
   const d = new Date(t);
-
   if(isNaN(d)) return t;
-
-  return d.toLocaleString("en-IN", {
-    timeZone: "Asia/Kolkata"
-  });
+  return d.toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});
 }
 
-// RENDER
 function render(data){
+  data = data.reverse(); // newest first
   renderStats(data);
 
   let html="";
@@ -180,13 +105,11 @@ function render(data){
   data.forEach((v,i)=>{
     html+=`
     <div class="card">
-
       <div class="top">
         <div>
           <b>${formatTime(v.time)}</b><br>
           📍 ${safe(v.city)}, ${safe(v.region)}
         </div>
-
         <button onclick="toggle(${i})">More</button>
       </div>
 
@@ -196,10 +119,9 @@ function render(data){
         📱 Device: ${safe(v.device)}<br>
         🌍 Browser: ${safe(v.browser)}<br>
         🔋 Battery: ${safe(v.battery)}<br>
-        ⚡ Charging: ${v.charging ? "Yes" : "No"}<br>
+        ⚡ Charging: ${v.charging ? "Yes":"No"}<br>
         🔗 Referrer: ${safe(v.referrer)}
       </div>
-
     </div>
     `;
   });
@@ -207,7 +129,6 @@ function render(data){
   document.getElementById("data").innerHTML = html;
 }
 
-// TOGGLE DETAILS
 function toggle(i){
   const el = document.getElementById("m"+i);
   el.style.display = el.style.display==="block" ? "none" : "block";
