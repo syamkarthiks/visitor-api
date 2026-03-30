@@ -1,6 +1,8 @@
 export default async function handler(req, res) {
   try {
     res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     let ip =
       req.headers['x-forwarded-for']?.split(',')[0] ||
@@ -30,11 +32,7 @@ export default async function handler(req, res) {
     if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
 
     // 🔗 referrer
-    let source = "Direct";
-    if (ua.includes("Instagram")) source = "Instagram";
-    else if (ua.includes("WhatsApp")) source = "WhatsApp";
-    else if (ua.includes("FB")) source = "Facebook";
-    else if (body.referrer) source = body.referrer;
+    let source = body.referrer || "Direct";
 
     const payload = {
       ip,
@@ -51,9 +49,8 @@ export default async function handler(req, res) {
 
       referrer: source,
 
-      time: new Date().toLocaleString("en-IN", {
-        timeZone: "Asia/Kolkata"
-      })
+      // ✅ FIXED time format
+      time: new Date().toISOString()
     };
 
     await fetch("https://cczcijtifrhihnpczfjt.supabase.co/rest/v1/visitors", {
