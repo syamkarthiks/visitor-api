@@ -4,50 +4,107 @@
 <title>Visitor Panel</title>
 
 <style>
-body{background:#0b1220;color:white;font-family:Poppins;padding:20px}
-h1{text-align:center}
+body{
+  background:#0b1220;
+  color:white;
+  font-family:Poppins;
+  padding:20px;
+}
 
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+/* login */
 #loginBox{
-  position:fixed;inset:0;
-  background:#000;display:flex;
-  justify-content:center;align-items:center;
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
 
 .box{
-  background:#111;padding:30px;border-radius:10px;
+  background:#111;
+  padding:30px;
+  border-radius:10px;
+  text-align:center;
 }
 
-button{padding:8px 15px;background:cyan;border:none;border-radius:6px}
-input{padding:8px;border-radius:6px;border:none}
+input{
+  padding:10px;
+  border-radius:6px;
+  border:none;
+  margin-top:10px;
+}
 
+button{
+  padding:8px 15px;
+  background:cyan;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+/* top stats */
+.stats{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  background:#111;
+  padding:10px 15px;
+  border-radius:10px;
+  box-shadow:0 0 10px cyan;
+}
+
+/* cards */
 .card{
-  background:#111;margin:10px 0;padding:15px;border-radius:10px;
+  background:#111;
+  margin:10px 0;
+  padding:15px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,255,255,0.2);
 }
 
 .top{
-  display:flex;justify-content:space-between;
+  display:flex;
+  justify-content:space-between;
 }
 
 .more{
-  display:none;font-size:12px;margin-top:10px;color:#ccc;
+  display:none;
+  font-size:13px;
+  margin-top:10px;
+  color:#ccc;
 }
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
 <div id="loginBox">
   <div class="box">
-    <h3>Enter Password </h3>
-    <input id="pass">
+    <h3>Enter Password</h3>
+    <input id="pass" placeholder="Password">
+    <br>
     <button onclick="login()">Enter</button>
   </div>
 </div>
 
-<h1>Visitor Dashboard !🚀</h1>
+<h1>Visitor Dashboard 🚀</h1>
 
 <button onclick="loadData()">🔄 Refresh</button>
 
+<div class="stats" id="stats"></div>
 <div id="data"></div>
 
 <script>
@@ -57,7 +114,7 @@ let DATA = [];
 function login(){
   const pass = document.getElementById("pass").value;
 
-  fetch("https://sksvisit.vercel.app/api/log", {
+  fetch("https://sksvisit.vercel.app/api/data", {
     headers:{ Authorization: "Bearer " + pass }
   })
   .then(res => res.json())
@@ -65,7 +122,8 @@ function login(){
     DATA = d;
     document.getElementById("loginBox").style.display="none";
     render(DATA);
-  });
+  })
+  .catch(()=>alert("Wrong password"));
 }
 
 function loadData(){
@@ -79,32 +137,46 @@ function loadData(){
   });
 }
 
+/* render stats */
+function renderStats(data){
+  const total = data.length;
+  const mobile = data.filter(v=>v.device !== "Desktop").length;
+  const desktop = data.filter(v=>v.device === "Desktop").length;
+
+  document.getElementById("stats").innerHTML = `
+    <div class="stat">👀 Total: ${total}</div>
+    <div class="stat">📱 Mobile: ${mobile}</div>
+    <div class="stat">💻 Desktop: ${desktop}</div>
+  `;
+}
+
+/* render cards */
 function render(data){
+  renderStats(data);
+
   let html="";
 
   data.forEach((v,i)=>{
-
     html+=`
     <div class="card">
 
       <div class="top">
         <div>
-          <b>${v.time}</b><br>
-          ${v.city}
+          <b>${formatTime(v.time)}</b><br>
+          ${v.city} (${v.region})
         </div>
 
         <button onclick="toggle(${i})">More</button>
       </div>
 
       <div class="more" id="m${i}">
-        IP: ${v.ip}<br>
-        ISP: ${v.isp}<br>
-        Region: ${v.region}<br>
-        Device: ${v.device}<br>
-        Browser: ${v.browser}<br>
-        Battery: ${v.battery}<br>
-        Charging: ${v.charging}<br>
-        Referrer: ${v.referrer}
+        🌐 IP: ${v.ip}<br>
+        🛰️ ISP: ${v.isp}<br>
+        📱 Device: ${v.device}<br>
+        🌍 Browser: ${v.browser}<br>
+        🔋 Battery: ${v.battery}<br>
+        ⚡ Charging: ${v.charging}<br>
+        🔗 Referrer: ${v.referrer}
       </div>
 
     </div>
@@ -114,9 +186,19 @@ function render(data){
   document.getElementById("data").innerHTML = html;
 }
 
+/* toggle */
 function toggle(i){
   const el = document.getElementById("m"+i);
   el.style.display = el.style.display==="block" ? "none" : "block";
+}
+
+/* better time format */
+function formatTime(t){
+  try{
+    return new Date(t).toLocaleString();
+  }catch{
+    return t;
+  }
 }
 
 </script>
