@@ -57,7 +57,7 @@ let DATA = [];
 function login(){
   const pass = document.getElementById("pass").value;
 
-  fetch("https://sksvisit.vercel.app/api/data", {
+  fetch("https://sksvisit.vercel.app/api/log", {
     headers:{ Authorization: "Bearer " + pass }
   })
   .then(res => res.json())
