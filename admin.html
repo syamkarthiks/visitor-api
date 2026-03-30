@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Visitor Panel</title>
+<title>Visitors Panel</title>
 
 <style>
 body{
@@ -50,7 +50,7 @@ button{
   margin-top:10px;
 }
 
-/* top stats */
+/* stats */
 .stats{
   display:flex;
   gap:10px;
@@ -100,7 +100,7 @@ button{
   </div>
 </div>
 
-<h1>Visitor Dashboard 🚀</h1>
+<h1>Visitors Dashboard .🚀</h1>
 
 <button onclick="loadData()">🔄 Refresh</button>
 
@@ -111,6 +111,7 @@ button{
 
 let DATA = [];
 
+// LOGIN
 function login(){
   const pass = document.getElementById("pass").value;
 
@@ -126,6 +127,7 @@ function login(){
   .catch(()=>alert("Wrong password"));
 }
 
+// REFRESH
 function loadData(){
   fetch("https://sksvisit.vercel.app/api/data", {
     headers:{ Authorization: "Bearer SY4M" }
@@ -137,7 +139,7 @@ function loadData(){
   });
 }
 
-/* render stats */
+// STATS
 function renderStats(data){
   const total = data.length;
   const mobile = data.filter(v=>v.device !== "Desktop").length;
@@ -150,7 +152,26 @@ function renderStats(data){
   `;
 }
 
-/* render cards */
+// SAFE VALUE
+function safe(val){
+  if(!val || val === "Unknown") return "—";
+  return val;
+}
+
+// FIX TIME
+function formatTime(t){
+  if(!t) return "—";
+
+  const d = new Date(t);
+
+  if(isNaN(d)) return t;
+
+  return d.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata"
+  });
+}
+
+// RENDER
 function render(data){
   renderStats(data);
 
@@ -163,20 +184,20 @@ function render(data){
       <div class="top">
         <div>
           <b>${formatTime(v.time)}</b><br>
-          ${v.city} (${v.region})
+          📍 ${safe(v.city)}, ${safe(v.region)}
         </div>
 
         <button onclick="toggle(${i})">More</button>
       </div>
 
       <div class="more" id="m${i}">
-        🌐 IP: ${v.ip}<br>
-        🛰️ ISP: ${v.isp}<br>
-        📱 Device: ${v.device}<br>
-        🌍 Browser: ${v.browser}<br>
-        🔋 Battery: ${v.battery}<br>
-        ⚡ Charging: ${v.charging}<br>
-        🔗 Referrer: ${v.referrer}
+        🌐 IP: ${safe(v.ip)}<br>
+        🛰️ ISP: ${safe(v.isp)}<br>
+        📱 Device: ${safe(v.device)}<br>
+        🌍 Browser: ${safe(v.browser)}<br>
+        🔋 Battery: ${safe(v.battery)}<br>
+        ⚡ Charging: ${v.charging ? "Yes" : "No"}<br>
+        🔗 Referrer: ${safe(v.referrer)}
       </div>
 
     </div>
@@ -186,19 +207,10 @@ function render(data){
   document.getElementById("data").innerHTML = html;
 }
 
-/* toggle */
+// TOGGLE DETAILS
 function toggle(i){
   const el = document.getElementById("m"+i);
   el.style.display = el.style.display==="block" ? "none" : "block";
-}
-
-/* better time format */
-function formatTime(t){
-  try{
-    return new Date(t).toLocaleString();
-  }catch{
-    return t;
-  }
 }
 
 </script>
