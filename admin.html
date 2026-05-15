@@ -97,12 +97,16 @@ function formatTime(t){
 }
 
 function render(data){
-  data = data.reverse(); // newest first
+
+  // 🔥 newest first
+  data.sort((a,b)=>new Date(b.time)-new Date(a.time));
+
   renderStats(data);
 
   let html="";
 
   data.forEach((v,i)=>{
+
     html+=`
     <div class="card">
       <div class="top">
@@ -110,6 +114,7 @@ function render(data){
           <b>${formatTime(v.time)}</b><br>
           📍 ${safe(v.city)}, ${safe(v.region)}
         </div>
+
         <button onclick="toggle(${i})">More</button>
       </div>
 
@@ -128,7 +133,6 @@ function render(data){
 
   document.getElementById("data").innerHTML = html;
 }
-
 function toggle(i){
   const el = document.getElementById("m"+i);
   el.style.display = el.style.display==="block" ? "none" : "block";
